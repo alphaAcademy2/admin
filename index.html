@@ -3,53 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Prayer Admin Dashboard</title>
+<title>Prayer Monitoring Admin</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Malayalam",sans-serif;background:#f3f6fa;color:#172033}
-header{background:#12213b;color:#fff;padding:18px}.head{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center}
-h1{font-size:20px;margin:0}.muted{font-size:12px;opacity:.75;margin-top:4px}
-main{max-width:1200px;margin:auto;padding:16px}.panel{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 5px 20px #0000000d}
-.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}label{display:block;font-size:12px;font-weight:700;margin-bottom:5px;color:#5d6878}
-input,select{width:100%;padding:11px;border:1px solid #d9e0e9;border-radius:10px;background:#fff}
-button{border:0;border-radius:10px;padding:11px 17px;background:#1769e0;color:#fff;font-weight:800;cursor:pointer}.print{background:#16834b}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}.stat{background:#f5f8fc;border-radius:14px;padding:15px}.stat span{font-size:12px;color:#657184}.stat b{display:block;font-size:25px;margin-top:5px}.green{color:#16834b}.red{color:#c62828}.blue{color:#1769e0}
-h2{font-size:17px;margin:0 0 13px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:9px;border-bottom:1px solid #e7ebf0;font-size:12px;text-align:center}th{background:#f2f5f8}td:first-child,th:first-child{text-align:left}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans Malayalam",sans-serif;background:#f4f7fb;color:#172033}
+header{background:#12213b;color:#fff;padding:18px 16px}
+.head{max-width:1250px;margin:auto;display:flex;justify-content:space-between;align-items:center}
+h1{font-size:21px;margin:0}.muted{font-size:12px;opacity:.78;margin-top:4px}
+main{max-width:1250px;margin:auto;padding:16px}
+.panel{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 5px 20px #0000000b}
+h2{font-size:17px;margin:0 0 13px}
+.report-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:15px}
+.tab{background:#eef3f9;color:#25344d;border:1px solid #dce4ef;padding:12px 8px;border-radius:12px;font-weight:800}
+.tab.active{background:#1769e0;color:#fff;border-color:#1769e0}
+.filters{display:grid;grid-template-columns:1.1fr 1.1fr 1.1fr auto;gap:10px;align-items:end}
+label{display:block;font-size:12px;font-weight:800;margin-bottom:5px;color:#5d6878}
+select{width:100%;padding:11px;border:1px solid #d9e0e9;border-radius:10px;background:#fff}
+button{border:0;border-radius:10px;padding:11px 16px;background:#1769e0;color:#fff;font-weight:800;cursor:pointer}
+.print{background:#16834b}
+.hint{font-size:12px;color:#687588;margin-top:10px}
+.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.stat{background:#f5f8fc;border-radius:14px;padding:14px;border:1px solid #e9eef5}
+.stat span{font-size:11px;color:#657184;display:block}.stat b{display:block;font-size:25px;margin-top:5px}
+.green{color:#16834b}.red{color:#c62828}.blue{color:#1769e0}.orange{color:#c46a00}
+.badge{display:inline-block;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:800;background:#eef3f9}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:720px}
+th,td{padding:9px;border-bottom:1px solid #e7ebf0;font-size:12px;text-align:center}th{background:#f2f5f8}td:first-child,th:first-child{text-align:left}
 #status{text-align:center;padding:15px;color:#697386}.error{color:#c62828}
+.titleline{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.sub{font-size:12px;color:#687588}
 .printhead{display:none;text-align:center;margin-bottom:15px}
-@media print{header,.controls-panel,.no-print{display:none!important}main{max-width:none;padding:0}.panel{box-shadow:none;padding:5px;margin-bottom:10px}.printhead{display:block}table{min-width:0}th,td{font-size:9px;padding:5px}}
+.empty{padding:25px;text-align:center;color:#758195}
+@media(max-width:900px){
+ .cards{grid-template-columns:repeat(3,1fr)}
+ .filters{grid-template-columns:1fr 1fr}
+ .filters .action{grid-column:1/-1}
+}
+@media(max-width:560px){
+ main{padding:10px}.panel{padding:13px;border-radius:14px}
+ .report-tabs{grid-template-columns:repeat(2,1fr)}
+ .cards{grid-template-columns:repeat(2,1fr)}
+ .filters{grid-template-columns:1fr}
+ .filters .action{grid-column:auto}
+ h1{font-size:17px}
+}
+@media print{
+ header,.controls-panel,.no-print,#status{display:none!important}
+ body{background:#fff}main{max-width:none;padding:0}.panel{box-shadow:none;padding:4px;margin-bottom:10px}
+ .printhead{display:block}table{min-width:0}th,td{font-size:9px;padding:5px}
+}
 </style>
 </head>
 <body>
-<header><div class="head"><div><h1>HIMAYATHUL ISLAM MADRASA</h1><div class="muted">NADUVATHUR • Prayer Monitoring Admin</div></div><div class="no-print">ADMIN</div></div></header>
+<header>
+<div class="head">
+ <div><h1>HIMAYATHUL ISLAM MADRASA</h1><div class="muted">NADUVATHUR • Prayer Monitoring Admin</div></div>
+ <div class="no-print">ADMIN</div>
+</div>
+</header>
 
 <main>
 <section class="panel controls-panel">
-<h2>Report</h2>
-<div class="controls">
-<div><label>Report Type</label><select id="type" onchange="changeType()"><option value="overall">Overall</option><option value="monthly">Monthly</option><option value="class">Class Wise</option><option value="student">Student Wise</option></select></div>
-<div><label>From Date</label><input id="from" type="date"></div>
-<div><label>To Date</label><input id="to" type="date"></div>
-<div id="monthBox" style="display:none"><label>Month</label><input id="month" type="month"></div>
-<div id="classBox" style="display:none"><label>Class</label><select id="class"><option value="">All Classes</option></select></div>
-<div id="studentBox" style="display:none"><label>Student</label><select id="student"><option value="">Select Student</option></select></div>
-<div style="display:flex;align-items:end;gap:7px"><button onclick="generate()">Generate</button><button class="print" onclick="window.print()">Print</button></div>
+<h2>റിപ്പോർട്ട് തിരഞ്ഞെടുക്കുക</h2>
+
+<div class="report-tabs">
+ <button class="tab active" data-mode="today" onclick="setMode('today')">ഇന്ന്</button>
+ <button class="tab" data-mode="week" onclick="setMode('week')">ഈ ആഴ്ച</button>
+ <button class="tab" data-mode="month" onclick="setMode('month')">ഈ മാസം</button>
+ <button class="tab" data-mode="year" onclick="setMode('year')">ഈ വർഷം</button>
+ <button class="tab" data-mode="total" onclick="setMode('total')">മൊത്തം</button>
 </div>
+
+<div class="filters">
+ <div>
+  <label>ക്ലാസ്</label>
+  <select id="classFilter" onchange="classChanged()"><option value="">എല്ലാ ക്ലാസുകളും</option></select>
+ </div>
+ <div>
+  <label>വിദ്യാർത്ഥി</label>
+  <select id="studentFilter" onchange="studentChanged()"><option value="">എല്ലാ വിദ്യാർത്ഥികളും</option></select>
+ </div>
+ <div id="periodBox">
+  <label id="periodLabel">മാസം</label>
+  <select id="periodSelect" onchange="generate()"></select>
+ </div>
+ <div class="action" style="display:flex;gap:7px">
+  <button onclick="generate()">റിപ്പോർട്ട് കാണിക്കുക</button>
+  <button class="print" onclick="window.print()">Print / PDF</button>
+ </div>
+</div>
+<div id="hint" class="hint"></div>
 </section>
 
 <div id="status">Loading...</div>
 
 <section id="report" style="display:none">
-<div class="printhead"><h2>HIMAYATHUL ISLAM MADRASA - NADUVATHUR</h2><div id="printTitle"></div></div>
-<section class="panel"><div class="cards">
-<div class="stat"><span>Students</span><b id="students">0</b></div>
-<div class="stat"><span>Total Prayers</span><b id="total">0</b></div>
-<div class="stat"><span>Performed</span><b class="green" id="done">0</b></div>
-<div class="stat"><span>Missed</span><b class="red" id="missed">0</b></div>
-<div class="stat"><span>Attendance</span><b class="blue" id="pct">0%</b></div>
-</div></section>
+<div class="printhead">
+ <h2>HIMAYATHUL ISLAM MADRASA - NADUVATHUR</h2>
+ <div id="printTitle"></div>
+</div>
 
-<section class="panel"><h2>Prayer Summary</h2><div class="tablewrap"><table id="summary"></table></div></section>
-<section class="panel"><h2 id="detailTitle">Student Summary</h2><div class="tablewrap"><table id="details"></table></div></section>
+<section class="panel">
+<div class="titleline">
+ <div><h2 id="reportTitle">ഇന്നത്തെ നിസ്കാര റിപ്പോർട്ട്</h2><div class="sub" id="dateRange"></div></div>
+</div>
+<div class="cards" style="margin-top:12px">
+ <div class="stat"><span>മൊത്തം കുട്ടികൾ</span><b id="students">0</b></div>
+ <div class="stat"><span>5/5 നിസ്കരിച്ചത്</span><b class="green" id="full">0</b></div>
+ <div class="stat"><span>1–4 നിസ്കരിച്ചത്</span><b class="orange" id="partial">0</b></div>
+ <div class="stat"><span>ഒന്നും നിസ്കരിക്കാത്തവർ</span><b class="red" id="none">0</b></div>
+ <div class="stat"><span>നിസ്കരിച്ച നിസ്കാരങ്ങൾ</span><b class="blue" id="done">0</b></div>
+ <div class="stat"><span>നിസ്കരിക്കാത്ത നിസ്കാരങ്ങൾ</span><b class="red" id="missed">0</b></div>
+</div>
+</section>
+
+<section class="panel">
+<h2>ഓരോ നിസ്കാരത്തിന്റെയും കണക്ക്</h2>
+<div class="tablewrap"><table id="prayerSummary"></table></div>
+</section>
+
+<section class="panel">
+<div class="titleline"><h2>ക്ലാസ് അടിസ്ഥാനത്തിലുള്ള കണക്ക്</h2><span class="badge" id="classBadge"></span></div>
+<div class="tablewrap"><table id="classSummary"></table></div>
+</section>
+
+<section class="panel" id="studentPanel">
+<h2 id="studentTitle">വിദ്യാർത്ഥി അടിസ്ഥാനത്തിലുള്ള കണക്ക്</h2>
+<div class="tablewrap"><table id="studentSummary"></table></div>
+</section>
 </section>
 </main>
 
@@ -57,54 +138,303 @@ h2{font-size:17px;margin:0 0 13px}.tablewrap{overflow:auto}table{width:100%;bord
 const API_URL='https://script.google.com/macros/s/AKfycbxqrPbBbo_MuLlOIfjBuzr95WqqBM3QMV8AYuI0JmPZwhX5ahOH5l9QyzXYae2alKDh/exec';
 const P=['Dhuhr','Asr','Maghrib','Isha','Fajr'];
 const L={Dhuhr:'ളുഹർ',Asr:'അസർ',Maghrib:'മഗ്‌രിബ്',Isha:'ഇശാ',Fajr:'സുബഹി'};
-let students=[],records=[];
+const DAY=['ഞായർ','തിങ്കൾ','ചൊവ്വ','ബുധൻ','വ്യാഴം','വെള്ളി','ശനി'];
+const MONTHS=['ജനുവരി','ഫെബ്രുവരി','മാർച്ച്','ഏപ്രിൽ','മേയ്','ജൂൺ','ജൂലൈ','ഓഗസ്റ്റ്','സെപ്റ്റംബർ','ഒക്ടോബർ','നവംബർ','ഡിസംബർ'];
+let students=[],records=[],mode='today';
 
 function api(action,data={}){
  return new Promise((resolve,reject)=>{
-  const cb='cb_'+Date.now()+'_'+Math.floor(Math.random()*99999),s=document.createElement('script');
-  const q=new URLSearchParams({action,callback:cb,...data}),t=setTimeout(()=>{clean();reject(Error('API timeout'))},20000);
+  const cb='cb_'+Date.now()+'_'+Math.floor(Math.random()*99999);
+  const s=document.createElement('script');
+  const q=new URLSearchParams({action,callback:cb,...data});
+  const t=setTimeout(()=>{clean();reject(Error('API timeout'))},20000);
   function clean(){clearTimeout(t);s.remove();delete window[cb]}
-  window[cb]=x=>{clean();resolve(x)};s.onerror=()=>{clean();reject(Error('API connection failed'))};
-  s.src=API_URL+'?'+q.toString();document.body.appendChild(s);
+  window[cb]=x=>{clean();resolve(x)};
+  s.onerror=()=>{clean();reject(Error('API connection failed'))};
+  s.src=API_URL+'?'+q.toString();
+  document.body.appendChild(s);
  });
 }
-async function load(){
- try{let r=await api('getAdminData');if(!r.ok)throw Error(r.message||'Could not load');
- students=r.students||[];records=r.records||[];fill();document.getElementById('status').textContent='Ready';
- }catch(e){document.getElementById('status').innerHTML='<span class="error">'+esc(e.message)+'</span>'}
+
+function localDate(d=new Date()){
+ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+ return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
 }
-function fill(){
- let cs=[...new Set(students.map(x=>String(x.className||'')).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
- document.getElementById('class').innerHTML='<option value="">All Classes</option>'+cs.map(x=>'<option>'+esc(x)+'</option>').join('');
- document.getElementById('student').innerHTML='<option value="">Select Student</option>'+students.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.name)+' — '+esc(x.id)+'</option>').join('');
+function parseDate(v){
+ if(!v)return null;
+ const s=String(v);
+ if(/^\\d{4}-\\d{2}-\\d{2}$/.test(s)){
+  const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d);
+ }
+ const x=new Date(v); return isNaN(x)?null:new Date(x.getFullYear(),x.getMonth(),x.getDate());
 }
-function changeType(){
- let t=document.getElementById('type').value;
- document.getElementById('classBox').style.display=t==='class'?'block':'none';
- document.getElementById('studentBox').style.display=t==='student'?'block':'none';
- document.getElementById('monthBox').style.display=t==='monthly'?'block':'none';
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function dateKey(d){return localDate(d)}
+function cycleToday(){
+ const now=new Date();
+ // Cycle starts at 10:00 AM. Before 10 AM, the current cycle is yesterday's cycle.
+ const base=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+ if(now.getHours()<10) return dateKey(addDays(base,-1));
+ return dateKey(base);
 }
-function d(v){if(!v)return '';if(/^\d{4}-\d{2}-\d{2}$/.test(String(v)))return String(v);let x=new Date(v);return isNaN(x)?'':x.toISOString().slice(0,10)}
+function startOfWeek(d){
+ const x=new Date(d); const day=x.getDay(); const diff=day===0?-6:1-day;
+ return addDays(x,diff);
+}
+function endOfWeek(d){return addDays(startOfWeek(d),6)}
+
+function setMode(m){
+ mode=m;
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));
+ setupPeriod();
+ generate();
+}
+function setupPeriod(){
+ const box=document.getElementById('periodBox'),label=document.getElementById('periodLabel'),sel=document.getElementById('periodSelect');
+ if(mode==='today'||mode==='week'||mode==='total'){box.style.display='none';document.getElementById('hint').textContent=scopeHint();return}
+ box.style.display='block';
+ if(mode==='month'){
+  label.textContent='മാസം';
+  const now=parseDate(cycleToday());
+  const opts=[];
+  for(let i=0;i<24;i++){
+   const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+   const v=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+   opts.push('<option value="'+v+'">'+MONTHS[d.getMonth()]+' '+d.getFullYear()+'</option>');
+  }
+  sel.innerHTML=opts.join('');
+  sel.value=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+ }else{
+  label.textContent='വർഷം';
+  const years=new Set(records.map(r=>{const d=parseDate(r.cycleDate);return d?d.getFullYear():null}).filter(Boolean));
+  const current=parseDate(cycleToday()).getFullYear(); years.add(current);
+  sel.innerHTML=[...years].sort((a,b)=>b-a).map(y=>'<option>'+y+'</option>').join('');
+  sel.value=current;
+ }
+ document.getElementById('hint').textContent=scopeHint();
+}
+function scopeHint(){
+ const d=parseDate(cycleToday());
+ if(mode==='today') return 'ഇന്നത്തെ സൈക്കിൾ: '+fmtDate(d)+' — ഇന്നലെ 10 AM മുതൽ ഇന്നത്തെ 10 AM വരെയുള്ള നിസ്കാര കണക്ക്.';
+ if(mode==='week') return 'ആഴ്ച: തിങ്കൾ മുതൽ ഞായർ വരെ. ഇപ്പോഴത്തെ ആഴ്ച സ്വയം തിരഞ്ഞെടുക്കുന്നു.';
+ if(mode==='month') return 'മാസം തിരഞ്ഞെടുക്കുക. തീയതി ടൈപ്പ് ചെയ്യേണ്ടതില്ല.';
+ if(mode==='year') return 'വർഷം തിരഞ്ഞെടുക്കുക. തീയതി ടൈപ്പ് ചെയ്യേണ്ടതില്ല.';
+ return 'PrayerRecords-ൽ സേവ് ചെയ്ത മുഴുവൻ കണക്കും.';
+}
+function fmtDate(d){return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear()}
+
+function classChanged(){
+ const c=document.getElementById('classFilter').value;
+ const current=document.getElementById('studentFilter').value;
+ const list=c?students.filter(s=>String(s.className)===c):students;
+ document.getElementById('studentFilter').innerHTML='<option value="">എല്ലാ വിദ്യാർത്ഥികളും</option>'+
+  list.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),'ml')).map(s=>'<option value="'+esc(s.id)+'">'+esc(s.name)+' — '+esc(s.id)+'</option>').join('');
+ if(list.some(s=>String(s.id)===current))document.getElementById('studentFilter').value=current;
+ generate();
+}
+function studentChanged(){
+ const id=document.getElementById('studentFilter').value;
+ if(id){
+  const s=students.find(x=>String(x.id)===id);
+  if(s)document.getElementById('classFilter').value=String(s.className||'');
+ }else{
+  // keep selected class if any
+ }
+ generate();
+}
+
+function fillFilters(){
+ const classes=[...new Set(students.map(s=>String(s.className||'')).filter(Boolean))]
+  .sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+ document.getElementById('classFilter').innerHTML='<option value="">എല്ലാ ക്ലാസുകളും</option>'+classes.map(c=>'<option value="'+esc(c)+'">ക്ലാസ് '+esc(c)+'</option>').join('');
+ classChanged();
+}
+
+function rangeForMode(){
+ const today=parseDate(cycleToday());
+ if(mode==='today') return [today,today];
+ if(mode==='week') return [startOfWeek(today),endOfWeek(today)];
+ if(mode==='month'){
+  const [y,m]=document.getElementById('periodSelect').value.split('-').map(Number);
+  return [new Date(y,m-1,1),new Date(y,m,0)];
+ }
+ if(mode==='year'){
+  const y=Number(document.getElementById('periodSelect').value);
+  return [new Date(y,0,1),new Date(y,11,31)];
+ }
+ return [null,null];
+}
+
+function inRange(record,[from,to]){
+ if(!from&&!to)return true;
+ const d=parseDate(record.cycleDate); if(!d)return false;
+ return d>=from&&d<=to;
+}
+function isTrue(v){return v===true||String(v).toLowerCase()==='true'||String(v)==='1'}
+function uniqueStudentsForScope(data){
+ return new Set(data.map(r=>String(r.studentId))).size;
+}
+function filteredData(){
+ const [from,to]=rangeForMode();
+ let data=records.filter(r=>inRange(r,[from,to]));
+ const c=document.getElementById('classFilter').value;
+ const id=document.getElementById('studentFilter').value;
+ if(c)data=data.filter(r=>String(r.className)===c);
+ if(id)data=data.filter(r=>String(r.studentId)===id);
+ return data;
+}
+function scopeStudents(){
+ const c=document.getElementById('classFilter').value;
+ const id=document.getElementById('studentFilter').value;
+ if(id)return students.filter(s=>String(s.id)===id);
+ if(c)return students.filter(s=>String(s.className)===c);
+ return students.slice();
+}
+
+function buildStudentStats(data, expectedCycles){
+ const map={};
+ data.forEach(r=>{
+  const id=String(r.studentId);
+  if(!map[id])map[id]={id,name:r.name||id,className:r.className||'',cycles:0,done:0,missed:0};
+  map[id].cycles++;
+  P.forEach(p=>{if(isTrue(r[p]))map[id].done++});
+ });
+ Object.keys(map).forEach(id=>{
+  map[id].missed=Math.max(0,expectedCycles*5-map[id].done);
+ });
+ return map;
+}
+function cycleCount(range){
+ if(!range[0]&&!range[1])return null;
+ const a=new Date(range[0]), b=new Date(range[1]);
+ if(b<a)return 0;
+ return Math.floor((b-a)/86400000)+1;
+}
+function effectiveRange(){
+ const range=rangeForMode();
+ if(mode==='total')return range;
+ const today=parseDate(cycleToday());
+ if(range[1]>today)range[1]=today;
+ return range;
+}
+function expectedForStudent(scopeCount,range){
+ const cycles=cycleCount(range);
+ return cycles==null?null:scopeCount*cycles*5;
+}
+
 function generate(){
- let type=document.getElementById('type').value,from=document.getElementById('from').value,to=document.getElementById('to').value;
- let data=records.filter(r=>(!from||d(r.cycleDate)>=from)&&(!to||d(r.cycleDate)<=to));
- if(type==='monthly'){let m=document.getElementById('month').value;if(!m){alert('Month തിരഞ്ഞെടുക്കുക');return}data=data.filter(r=>d(r.cycleDate).slice(0,7)===m)}
- if(type==='class'){let c=document.getElementById('class').value;if(c)data=data.filter(r=>String(r.className)===c)}
- if(type==='student'){let id=document.getElementById('student').value;if(!id){alert('Student തിരഞ്ഞെടുക്കുക');return}data=data.filter(r=>String(r.studentId)===id)}
- let ids=new Set(data.map(r=>String(r.studentId))),sum={};P.forEach(p=>sum[p]={d:0,t:0});
- let total=0,done=0;
- data.forEach(r=>P.forEach(p=>{sum[p].t++;total++;if(r[p]===true||String(r[p]).toLowerCase()==='true'){sum[p].d++;done++}}));
- document.getElementById('students').textContent=type==='student'?1:(type==='class'?ids.size:students.length);
- document.getElementById('total').textContent=total;document.getElementById('done').textContent=done;document.getElementById('missed').textContent=total-done;document.getElementById('pct').textContent=(total?(done/total*100).toFixed(1):0)+'%';
- document.getElementById('summary').innerHTML='<tr><th>Prayer</th><th>Performed</th><th>Missed</th><th>%</th></tr>'+P.map(p=>{let x=sum[p],z=x.t?x.d/x.t*100:0;return '<tr><td>'+L[p]+'</td><td class="green">'+x.d+'</td><td class="red">'+(x.t-x.d)+'</td><td>'+z.toFixed(1)+'%</td></tr>'}).join('');
- let m={};data.forEach(r=>{let k=String(r.studentId);if(!m[k])m[k]={id:k,name:r.name||k,c:r.className||'',d:0,t:0};P.forEach(p=>{m[k].t++;if(r[p]===true||String(r[p]).toLowerCase()==='true')m[k].d++})});
- let rows=Object.values(m).sort((a,b)=>a.c.localeCompare(b.c,undefined,{numeric:true})||a.name.localeCompare(b.name));
- document.getElementById('details').innerHTML='<tr><th>Student</th><th>ID</th><th>Class</th><th>Performed</th><th>Missed</th><th>%</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.id)+'</td><td>'+esc(x.c)+'</td><td class="green">'+x.d+'</td><td class="red">'+(x.t-x.d)+'</td><td>'+(x.t?(x.d/x.t*100).toFixed(1):0)+'%</td></tr>').join('');
- document.getElementById('detailTitle').textContent=type==='class'?'Class Student Summary':type==='student'?'Student Details':'Student Summary';
- document.getElementById('printTitle').textContent=(type==='overall'?'Overall':type==='monthly'?'Monthly':' '+(type==='class'?'Class Wise':'Student Wise'))+' Prayer Report';
+ if(!records.length||!students.length)return;
+ const data=filteredData();
+ const scoped=scopeStudents();
+ const er=effectiveRange();
+ const cycles=cycleCount(er);
+ const map=buildStudentStats(data,cycles||0);
+
+ let full=0,partial=0,none=0;
+ scoped.forEach(s=>{
+  const st=map[String(s.id)];
+  const done=st?st.done:0;
+  if(mode==='today'){
+   if(done>=5)full++; else if(done>0)partial++; else none++;
+  }else{
+   if(done>0)partial++; else none++;
+  }
+ });
+
+ let done=0;
+ P.forEach(p=>data.forEach(r=>{if(isTrue(r[p]))done++}));
+ const expected=expectedForStudent(scoped.length,er);
+ const total=(expected==null)?data.length*5:expected;
+ const missed=Math.max(0,total-done);
+
+ document.getElementById('students').textContent=scoped.length;
+ document.getElementById('full').textContent=mode==='today'?full:'—';
+ document.getElementById('partial').textContent=partial;
+ document.getElementById('none').textContent=none;
+ document.getElementById('done').textContent=done;
+ document.getElementById('missed').textContent=missed;
+
+ const range=rangeForMode();
+ let title='ഇന്നത്തെ നിസ്കാര റിപ്പോർട്ട്',rangeText='';
+ if(mode==='today'){title='ഇന്നത്തെ നിസ്കാര റിപ്പോർട്ട്';rangeText=fmtDate(range[0])}
+ if(mode==='week'){title='ഈ ആഴ്ചയുടെ നിസ്കാര റിപ്പോർട്ട്';rangeText=fmtDate(range[0])+' – '+fmtDate(effectiveRange()[1])}
+ if(mode==='month'){title='മാസ റിപ്പോർട്ട്';rangeText=document.getElementById('periodSelect').selectedOptions[0].text}
+ if(mode==='year'){title='വാർഷിക റിപ്പോർട്ട്';rangeText=document.getElementById('periodSelect').value}
+ if(mode==='total'){title='മൊത്തം നിസ്കാര റിപ്പോർട്ട്';rangeText='എല്ലാ ലഭ്യമായ PrayerRecords'}
+ document.getElementById('reportTitle').textContent=title;
+ document.getElementById('dateRange').textContent=rangeText;
+ document.getElementById('printTitle').textContent=title+' • '+rangeText;
+
+ renderPrayerSummary(data,total,done);
+ renderClassSummary(scoped,map,data,cycles);
+ renderStudentSummary(scoped,map,cycles);
+ document.getElementById('classBadge').textContent=scoped.length+' കുട്ടികൾ';
+ document.getElementById('studentTitle').textContent=document.getElementById('studentFilter').value?'തിരഞ്ഞെടുത്ത വിദ്യാർത്ഥിയുടെ കണക്ക്':'വിദ്യാർത്ഥി അടിസ്ഥാനത്തിലുള്ള കണക്ക്';
  document.getElementById('report').style.display='block';
 }
+
+function renderPrayerSummary(data,totalAll,doneAll){
+ let html='<tr><th>നിസ്കാരം</th><th>നിസ്കരിച്ചത്</th><th>നിസ്കരിക്കാത്തത്</th><th>ശതമാനം</th></tr>';
+ const scoped=scopeStudents().length;
+ const er=effectiveRange();
+ const cycles=cycleCount(er)||0;
+ const possiblePerPrayer=mode==='total'?null:scoped*cycles;
+ P.forEach(p=>{
+  const d=data.reduce((n,r)=>n+(isTrue(r[p])?1:0),0);
+  const t=possiblePerPrayer==null?data.length:(possiblePerPrayer);
+  const m=Math.max(0,t-d);
+  html+='<tr><td>'+L[p]+'</td><td class="green">'+d+'</td><td class="red">'+m+'</td><td>'+((d/t*100)||0).toFixed(1)+'%</td></tr>';
+ });
+ document.getElementById('prayerSummary').innerHTML=html;
+}
+
+function renderClassSummary(scoped,map,data,cycles){
+ const classes=[...new Set(scoped.map(s=>String(s.className||'')).filter(Boolean))]
+  .sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+ let html='<tr><th>ക്ലാസ്</th><th>കുട്ടികൾ</th><th>5/5</th><th>1–4</th><th>0/5</th><th>നിസ്കരിച്ചത്</th><th>നിസ്കരിക്കാത്തത്</th><th>%</th></tr>';
+ classes.forEach(c=>{
+  const ss=scoped.filter(s=>String(s.className)===c), ids=new Set(ss.map(s=>String(s.id)));
+  const rs=data.filter(r=>ids.has(String(r.studentId)));
+  let d=0;
+  rs.forEach(r=>P.forEach(p=>{if(isTrue(r[p]))d++}));
+  const expected=mode==='total'?null:ss.length*(cycles||0)*5;
+  const t=expected==null?rs.length*5:expected;
+  let f=0,pa=0,no=0;
+  ss.forEach(s=>{const st=map[String(s.id)],x=st?st.done:0;if(mode==='today'){if(x>=5)f++;else if(x>0)pa++;else no++}else{if(x>0)pa++;else no++}});
+  html+='<tr><td>ക്ലാസ് '+esc(c)+'</td><td>'+ss.length+'</td><td>'+ (mode==='today'?f:'—') +'</td><td>'+pa+'</td><td>'+no+'</td><td class="green">'+d+'</td><td class="red">'+Math.max(0,t-d)+'</td><td>'+((d/t*100)||0).toFixed(1)+'%</td></tr>';
+ });
+ if(!classes.length)html+='<tr><td colspan="8" class="empty">ഡാറ്റ ലഭ്യമല്ല</td></tr>';
+ document.getElementById('classSummary').innerHTML=html;
+}
+
+function renderStudentSummary(scoped,map,cycles){
+ let html='<tr><th>വിദ്യാർത്ഥി</th><th>ID</th><th>ക്ലാസ്</th><th>നിസ്കരിച്ചത്</th><th>നിസ്കരിക്കാത്തത്</th><th>%</th></tr>';
+ const rows=scoped.slice().sort((a,b)=>String(a.className).localeCompare(String(b.className),undefined,{numeric:true})||String(a.name).localeCompare(String(b.name),'ml'));
+ rows.forEach(s=>{
+  const st=map[String(s.id)]||{done:0};
+  let t;
+  if(mode==='total') t=st.done+(records.filter(r=>String(r.studentId)===String(s.id)).length*5-st.done);
+  else t=(cycles||0)*5;
+  const miss=Math.max(0,t-st.done);
+  html+='<tr><td>'+esc(s.name)+'</td><td>'+esc(s.id)+'</td><td>'+esc(s.className)+'</td><td class="green">'+st.done+'</td><td class="red">'+miss+'</td><td>'+((st.done/t*100)||0).toFixed(1)+'%</td></tr>';
+ });
+ if(!rows.length)html+='<tr><td colspan="6" class="empty">ഡാറ്റ ലഭ്യമല്ല</td></tr>';
+ document.getElementById('studentSummary').innerHTML=html;
+}
+
 function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+
+async function load(){
+ try{
+  const r=await api('getAdminData');
+  if(!r.ok)throw Error(r.message||'Could not load');
+  students=r.students||[];records=r.records||[];
+  fillFilters();setupPeriod();generate();
+  document.getElementById('status').textContent='Ready';
+ }catch(e){
+  document.getElementById('status').innerHTML='<span class="error">'+esc(e.message)+'</span>';
+ }
+}
 load();
 </script>
 </body>
