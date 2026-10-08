@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prayer Admin Dashboard</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Malayalam",sans-serif;background:#f3f6fa;color:#172033}
+header{background:#12213b;color:#fff;padding:18px}.head{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center}
+h1{font-size:20px;margin:0}.muted{font-size:12px;opacity:.75;margin-top:4px}
+main{max-width:1200px;margin:auto;padding:16px}.panel{background:#fff;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 5px 20px #0000000d}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}label{display:block;font-size:12px;font-weight:700;margin-bottom:5px;color:#5d6878}
+input,select{width:100%;padding:11px;border:1px solid #d9e0e9;border-radius:10px;background:#fff}
+button{border:0;border-radius:10px;padding:11px 17px;background:#1769e0;color:#fff;font-weight:800;cursor:pointer}.print{background:#16834b}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}.stat{background:#f5f8fc;border-radius:14px;padding:15px}.stat span{font-size:12px;color:#657184}.stat b{display:block;font-size:25px;margin-top:5px}.green{color:#16834b}.red{color:#c62828}.blue{color:#1769e0}
+h2{font-size:17px;margin:0 0 13px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{padding:9px;border-bottom:1px solid #e7ebf0;font-size:12px;text-align:center}th{background:#f2f5f8}td:first-child,th:first-child{text-align:left}
+#status{text-align:center;padding:15px;color:#697386}.error{color:#c62828}
+.printhead{display:none;text-align:center;margin-bottom:15px}
+@media print{header,.controls-panel,.no-print{display:none!important}main{max-width:none;padding:0}.panel{box-shadow:none;padding:5px;margin-bottom:10px}.printhead{display:block}table{min-width:0}th,td{font-size:9px;padding:5px}}
+</style>
+</head>
+<body>
+<header><div class="head"><div><h1>HIMAYATHUL ISLAM MADRASA</h1><div class="muted">NADUVATHUR • Prayer Monitoring Admin</div></div><div class="no-print">ADMIN</div></div></header>
+
+<main>
+<section class="panel controls-panel">
+<h2>Report</h2>
+<div class="controls">
+<div><label>Report Type</label><select id="type" onchange="changeType()"><option value="overall">Overall</option><option value="monthly">Monthly</option><option value="class">Class Wise</option><option value="student">Student Wise</option></select></div>
+<div><label>From Date</label><input id="from" type="date"></div>
+<div><label>To Date</label><input id="to" type="date"></div>
+<div id="monthBox" style="display:none"><label>Month</label><input id="month" type="month"></div>
+<div id="classBox" style="display:none"><label>Class</label><select id="class"><option value="">All Classes</option></select></div>
+<div id="studentBox" style="display:none"><label>Student</label><select id="student"><option value="">Select Student</option></select></div>
+<div style="display:flex;align-items:end;gap:7px"><button onclick="generate()">Generate</button><button class="print" onclick="window.print()">Print</button></div>
+</div>
+</section>
+
+<div id="status">Loading...</div>
+
+<section id="report" style="display:none">
+<div class="printhead"><h2>HIMAYATHUL ISLAM MADRASA - NADUVATHUR</h2><div id="printTitle"></div></div>
+<section class="panel"><div class="cards">
+<div class="stat"><span>Students</span><b id="students">0</b></div>
+<div class="stat"><span>Total Prayers</span><b id="total">0</b></div>
+<div class="stat"><span>Performed</span><b class="green" id="done">0</b></div>
+<div class="stat"><span>Missed</span><b class="red" id="missed">0</b></div>
+<div class="stat"><span>Attendance</span><b class="blue" id="pct">0%</b></div>
+</div></section>
+
+<section class="panel"><h2>Prayer Summary</h2><div class="tablewrap"><table id="summary"></table></div></section>
+<section class="panel"><h2 id="detailTitle">Student Summary</h2><div class="tablewrap"><table id="details"></table></div></section>
+</section>
+</main>
+
+<script>
+const API_URL='https://script.google.com/macros/s/AKfycbxqrPbBbo_MuLlOIfjBuzr95WqqBM3QMV8AYuI0JmPZwhX5ahOH5l9QyzXYae2alKDh/exec';
+const P=['Dhuhr','Asr','Maghrib','Isha','Fajr'];
+const L={Dhuhr:'ളുഹർ',Asr:'അസർ',Maghrib:'മഗ്‌രിബ്',Isha:'ഇശാ',Fajr:'സുബഹി'};
+let students=[],records=[];
+
+function api(action,data={}){
+ return new Promise((resolve,reject)=>{
+  const cb='cb_'+Date.now()+'_'+Math.floor(Math.random()*99999),s=document.createElement('script');
+  const q=new URLSearchParams({action,callback:cb,...data}),t=setTimeout(()=>{clean();reject(Error('API timeout'))},20000);
+  function clean(){clearTimeout(t);s.remove();delete window[cb]}
+  window[cb]=x=>{clean();resolve(x)};s.onerror=()=>{clean();reject(Error('API connection failed'))};
+  s.src=API_URL+'?'+q.toString();document.body.appendChild(s);
+ });
+}
+async function load(){
+ try{let r=await api('getAdminData');if(!r.ok)throw Error(r.message||'Could not load');
+ students=r.students||[];records=r.records||[];fill();document.getElementById('status').textContent='Ready';
+ }catch(e){document.getElementById('status').innerHTML='<span class="error">'+esc(e.message)+'</span>'}
+}
+function fill(){
+ let cs=[...new Set(students.map(x=>String(x.className||'')).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
+ document.getElementById('class').innerHTML='<option value="">All Classes</option>'+cs.map(x=>'<option>'+esc(x)+'</option>').join('');
+ document.getElementById('student').innerHTML='<option value="">Select Student</option>'+students.map(x=>'<option value="'+esc(x.id)+'">'+esc(x.name)+' — '+esc(x.id)+'</option>').join('');
+}
+function changeType(){
+ let t=document.getElementById('type').value;
+ document.getElementById('classBox').style.display=t==='class'?'block':'none';
+ document.getElementById('studentBox').style.display=t==='student'?'block':'none';
+ document.getElementById('monthBox').style.display=t==='monthly'?'block':'none';
+}
+function d(v){if(!v)return '';if(/^\d{4}-\d{2}-\d{2}$/.test(String(v)))return String(v);let x=new Date(v);return isNaN(x)?'':x.toISOString().slice(0,10)}
+function generate(){
+ let type=document.getElementById('type').value,from=document.getElementById('from').value,to=document.getElementById('to').value;
+ let data=records.filter(r=>(!from||d(r.cycleDate)>=from)&&(!to||d(r.cycleDate)<=to));
+ if(type==='monthly'){let m=document.getElementById('month').value;if(!m){alert('Month തിരഞ്ഞെടുക്കുക');return}data=data.filter(r=>d(r.cycleDate).slice(0,7)===m)}
+ if(type==='class'){let c=document.getElementById('class').value;if(c)data=data.filter(r=>String(r.className)===c)}
+ if(type==='student'){let id=document.getElementById('student').value;if(!id){alert('Student തിരഞ്ഞെടുക്കുക');return}data=data.filter(r=>String(r.studentId)===id)}
+ let ids=new Set(data.map(r=>String(r.studentId))),sum={};P.forEach(p=>sum[p]={d:0,t:0});
+ let total=0,done=0;
+ data.forEach(r=>P.forEach(p=>{sum[p].t++;total++;if(r[p]===true||String(r[p]).toLowerCase()==='true'){sum[p].d++;done++}}));
+ document.getElementById('students').textContent=type==='student'?1:(type==='class'?ids.size:students.length);
+ document.getElementById('total').textContent=total;document.getElementById('done').textContent=done;document.getElementById('missed').textContent=total-done;document.getElementById('pct').textContent=(total?(done/total*100).toFixed(1):0)+'%';
+ document.getElementById('summary').innerHTML='<tr><th>Prayer</th><th>Performed</th><th>Missed</th><th>%</th></tr>'+P.map(p=>{let x=sum[p],z=x.t?x.d/x.t*100:0;return '<tr><td>'+L[p]+'</td><td class="green">'+x.d+'</td><td class="red">'+(x.t-x.d)+'</td><td>'+z.toFixed(1)+'%</td></tr>'}).join('');
+ let m={};data.forEach(r=>{let k=String(r.studentId);if(!m[k])m[k]={id:k,name:r.name||k,c:r.className||'',d:0,t:0};P.forEach(p=>{m[k].t++;if(r[p]===true||String(r[p]).toLowerCase()==='true')m[k].d++})});
+ let rows=Object.values(m).sort((a,b)=>a.c.localeCompare(b.c,undefined,{numeric:true})||a.name.localeCompare(b.name));
+ document.getElementById('details').innerHTML='<tr><th>Student</th><th>ID</th><th>Class</th><th>Performed</th><th>Missed</th><th>%</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.id)+'</td><td>'+esc(x.c)+'</td><td class="green">'+x.d+'</td><td class="red">'+(x.t-x.d)+'</td><td>'+(x.t?(x.d/x.t*100).toFixed(1):0)+'%</td></tr>').join('');
+ document.getElementById('detailTitle').textContent=type==='class'?'Class Student Summary':type==='student'?'Student Details':'Student Summary';
+ document.getElementById('printTitle').textContent=(type==='overall'?'Overall':type==='monthly'?'Monthly':' '+(type==='class'?'Class Wise':'Student Wise'))+' Prayer Report';
+ document.getElementById('report').style.display='block';
+}
+function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;')}
+load();
+</script>
+</body>
+</html>
