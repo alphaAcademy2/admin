@@ -1,293 +1,41 @@
-<!doctype html>
-<html lang="ml">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HIMAYATHUL ISLAM MADRASA – Admin & Teacher</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!doctype html><html lang="ml"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>HIMAYATHUL ISLAM MADRASA | Portal</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Malayalam:wght@400;500;600;700;800&display=swap" rel="stylesheet"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f2f5fa;color:#17243a;font-family:Inter,'Noto Sans Malayalam',sans-serif}
-.wrap{max-width:1100px;margin:auto;padding:22px 15px}
-.head{background:linear-gradient(120deg,#102b50,#1766a5);color:white;border-radius:22px;padding:22px}
-.head h2{margin:0;font-size:20px}.muted{color:#748197;font-size:13px}.head .muted{color:#d7e7f7}
-.card{background:white;border-radius:17px;padding:18px;margin:14px 0;box-shadow:0 5px 20px #193b6410}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.formgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-input,select,textarea{width:100%;padding:11px;border:1px solid #dce4ee;border-radius:10px;font:inherit;margin:5px 0 10px}
-textarea{min-height:75px}label{font-size:12px;font-weight:700;color:#59677b}
-button{border:0;background:#1766a5;color:white;padding:11px 15px;border-radius:10px;font-weight:700;cursor:pointer}
-.secondary{background:#e8eff7;color:#17436e}.tabs{display:flex;gap:8px;flex-wrap:wrap}
-.tabs button{background:#e8eff7;color:#17436e}.tabs button.active{background:#1766a5;color:white}
-.hidden{display:none!important}.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.item{padding:12px 0;border-bottom:1px solid #edf1f6}.item:last-child{border:0}
-.status{padding:10px;color:#1766a5}.error{color:#b42318}
-.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:600px}
-th,td{text-align:left;padding:10px;border-bottom:1px solid #e8edf4;font-size:13px}th{background:#f4f7fb}
-.qrgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-top:15px}
-.qrCard{border:1px solid #dce4ee;border-radius:13px;padding:12px;text-align:center;background:#fff;break-inside:avoid}
-.qrCard h4{margin:2px 0 5px;font-size:14px}.qrCard p{margin:3px 0 8px;font-size:12px;color:#65748b}
-.qrbox{display:flex;justify-content:center;align-items:center;min-height:135px}.qrbox canvas,.qrbox img{max-width:128px;height:auto}
-.qrCard a{font-size:11px;overflow-wrap:anywhere}.pill{display:inline-block;background:#e8f2fb;color:#14558a;border-radius:30px;padding:4px 8px;font-size:11px;font-weight:700}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
-@media(max-width:700px){.grid,.formgrid{grid-template-columns:1fr 1fr}}
-@media(max-width:460px){.grid,.formgrid{grid-template-columns:1fr}.wrap{padding:12px}}
-@media print{
- body{background:#fff}.wrap{max-width:none;padding:0}.head,#login,#app>.row,#adminTabs,#teacherTabs,.no-print,#students,#records,#exams,#notices{display:none!important}
- #app{display:block!important}.card{box-shadow:none;border:0;margin:0;padding:0}
- #teachers{display:block!important}.qrgrid{grid-template-columns:repeat(4,1fr);gap:7px}
- .qrCard{padding:7px;border:1px solid #bbb}.qrbox{min-height:100px}
- .qrbox canvas,.qrbox img{max-width:92px}
-}
-</style>
-</head>
-<body>
-<main class="wrap">
-  <div class="head"><h2>☪ HIMAYATHUL ISLAM MADRASA</h2><div class="muted">NADUVATHUR · MANAGEMENT PORTAL</div></div>
-
-  <section id="login" class="card">
-    <h3 id="loginTitle">Admin / Teacher Login</h3>
-    <p class="muted">QR Code വഴി തുറന്നാൽ പ്രവേശനം സ്വയം നടക്കും. അല്ലെങ്കിൽ access token നൽകുക.</p>
-    <input id="tokenInput" placeholder="Access token" autocomplete="off">
-    <button id="loginButton" onclick="manualLogin()">Login</button>
-    <div id="loginMsg" class="status"></div>
-  </section>
-
-  <div id="app" class="hidden">
-    <div class="card row"><div><b id="who"></b><div class="muted" id="scope"></div></div><button class="secondary no-print" onclick="logout()">Logout</button></div>
-    <div id="adminTabs" class="tabs no-print">
-      <button class="active" onclick="tab('students',this)">വിദ്യാർത്ഥികൾ</button>
-      <button onclick="tab('teachers',this)">അധ്യാപകർ / QR</button>
-      <button onclick="tab('records',this)">പഠന രേഖകൾ</button>
-      <button onclick="tab('exams',this)">പരീക്ഷകൾ</button>
-      <button onclick="tab('notices',this)">അറിയിപ്പുകൾ</button>
-    </div>
-    <div id="teacherTabs" class="tabs hidden no-print"><button class="active" onclick="tab('records',this)">എന്റെ ക്ലാസ്</button></div>
-
-    <section id="students" class="card adminOnly">
-      <h3>വിദ്യാർത്ഥി ചേർക്കുക / പുതുക്കുക</h3>
-      <div class="formgrid">
-        <label>Admission ID<input id="sid"></label><label>പേര്<input id="sname"></label><label>ക്ലാസ്<select id="sclass"></select></label>
-        <label>Gender<input id="gender"></label><label>Parent Name<input id="parent"></label><label>Phone<input id="phone"></label>
-      </div>
-      <button onclick="saveStudent()">Save Student</button><div id="studentsList"></div>
-    </section>
-
-    <section id="teachers" class="card adminOnly hidden">
-      <div class="row"><div><h3>അധ്യാപകർ / Teacher QR Codes</h3><p class="muted">ഓരോ ക്ലാസിനും പ്രത്യേകം Teacher Login QR. സൂപ്പർ അഡ്മിന് എല്ലാ ക്ലാസുകളിലേക്കും പ്രവേശനം.</p></div>
-        <button class="secondary no-print" onclick="window.print()">Print QR Codes</button>
-      </div>
-      <div class="formgrid no-print">
-        <label>ക്ലാസ്<select id="tclass"></select></label>
-        <label>അധ്യാപകന്റെ പേര്<input id="tname" placeholder="ഉസ്താദിന്റെ പേര്"></label>
-      </div>
-      <div class="actions no-print"><button onclick="saveTeacher()">Save Teacher</button><button class="secondary" onclick="loadQRLinks()">Refresh QR Links</button></div>
-      <div id="teacherList"></div>
-      <div id="qrStatus" class="status no-print"></div>
-      <div id="qrCards" class="qrgrid"></div>
-      <p class="muted no-print">QR ലിങ്കുകൾ പുതിയതായി സൃഷ്ടിക്കുന്നതല്ല; backend നൽകുന്ന നിലവിലെ Teacher Token ഉപയോഗിച്ചാണ് ഇവ കാണിക്കുന്നത്.</p>
-    </section>
-
-    <section id="records" class="card hidden">
-      <h3 id="recordHeading">പഠന രേഖ / ചോദ്യം സൃഷ്ടിക്കുക</h3>
-      <div class="formgrid">
-        <label>ചോദ്യം / തലക്കെട്ട്<input id="rtitle" placeholder="ഇന്ന് എല്ലാവരും പഠിച്ചിട്ടുണ്ടോ?"></label>
-        <label>വിവരണം<input id="rdesc"></label>
-        <label>ഉത്തരരീതി<select id="rtype"><option value="yesno">അതെ / ഇല്ല</option><option value="text">വിവരണ ഉത്തരം</option><option value="choice">ഓപ്ഷനുകളിൽ നിന്ന്</option></select></label>
-        <label>ഓപ്ഷനുകൾ (| ഉപയോഗിച്ച് വേർതിരിക്കുക)<input id="roptions" placeholder="A|B|C"></label>
-        <label>അവസാന തീയതി<input id="due" type="date"></label>
-      </div>
-      <button onclick="createRecord()">Create</button><div id="recordList"></div>
-    </section>
-
-    <section id="exams" class="card adminOnly hidden">
-      <h3>പരീക്ഷ സൃഷ്ടിക്കുക</h3>
-      <div class="formgrid"><label>Exam Title<input id="etitle"></label><label>ക്ലാസ്<select id="eclass"></select></label><label>Subject<input id="subject"></label><label>Date<input id="edate" type="date"></label><label>Maximum Marks<input id="maxmarks" type="number" value="100"></label></div>
-      <button onclick="createExam()">Create Exam</button><hr><h3>മാർക്ക് രേഖപ്പെടുത്തുക</h3>
-      <div class="formgrid"><label>Exam<select id="examPick"></select></label><label>Student ID<input id="resultStudent"></label><label>Marks<input id="marks" type="number"></label><label>Remarks<input id="remarks"></label></div>
-      <button onclick="saveResult()">Save Result</button><div id="examList"></div>
-    </section>
-
-    <section id="notices" class="card adminOnly hidden">
-      <h3>അറിയിപ്പ് പ്രസിദ്ധീകരിക്കുക</h3><label>Title<input id="ntitle"></label><label>Message<textarea id="nmessage"></textarea></label>
-      <div class="formgrid"><label>ആർക്കാണ്<select id="ntarget"><option value="All">എല്ലാവർക്കും</option><option value="Class">ഒരു ക്ലാസിന്</option><option value="Student">ഒരു വിദ്യാർത്ഥിക്ക്</option></select></label><label>ക്ലാസ്<select id="nclass"></select></label><label>Student ID<input id="nstudent"></label></div>
-      <button onclick="createNotice()">Publish Notice</button><div id="noticeList"></div>
-    </section>
-    <div id="msg" class="status"></div>
-  </div>
-</main>
-
+:root{--navy:#10243d;--blue:#2563eb;--cyan:#16a6a1;--ink:#172b45;--muted:#718096;--line:#e8edf4;--bg:#f4f7fb;--white:#fff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,'Noto Sans Malayalam',sans-serif}.shell{max-width:1240px;margin:auto;padding:22px}.hero{background:linear-gradient(120deg,#0d2038,#174c76 62%,#157c82);color:#fff;border-radius:24px;padding:25px 28px;display:flex;justify-content:space-between;align-items:center;gap:15px;box-shadow:0 16px 36px #10243d20}.brand{font-weight:800;letter-spacing:.2px;font-size:19px}.sub{color:#c7d8e8;font-size:12px;margin-top:6px;letter-spacing:1.4px}.hero small{color:#d6e6f3}.login{max-width:430px;margin:9vh auto;background:#fff;padding:30px;border-radius:22px;box-shadow:0 18px 50px #173b6318}.login h2{margin:0 0 8px}.muted{color:var(--muted);font-size:13px}input,select,textarea{width:100%;padding:12px 13px;border:1px solid #dce4ee;border-radius:11px;font:inherit;background:#fff;margin:6px 0 13px;color:var(--ink)}textarea{min-height:92px}label{font-size:12px;font-weight:700;color:#53647b}button{border:0;background:var(--blue);color:#fff;padding:11px 16px;border-radius:11px;font:inherit;font-weight:700;cursor:pointer}button:hover{filter:brightness(.96)}.ghost{background:#edf3fa;color:#234568}.danger{background:#fff0f0;color:#ad3030}.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:18px 0}.who{font-weight:800}.scope{font-size:12px;color:var(--muted);margin-top:4px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.tile{background:#fff;border:1px solid var(--line);border-radius:19px;padding:20px;text-align:left;min-height:145px;box-shadow:0 7px 22px #10243d08;transition:.18s}.tile:hover{transform:translateY(-3px);box-shadow:0 14px 30px #10243d12}.tile .ico{width:42px;height:42px;border-radius:13px;background:#eaf2ff;display:grid;place-items:center;font-size:21px;margin-bottom:15px}.tile h3{font-size:16px;margin:0 0 7px}.tile p{font-size:12px;color:var(--muted);margin:0;line-height:1.7}.section{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;margin-top:16px;box-shadow:0 7px 22px #10243d07}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.sectionhead h2{font-size:19px;margin:0}.back{background:#edf3fa;color:#234568}.hidden{display:none!important}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.stat{background:#fff;border:1px solid var(--line);padding:17px;border-radius:16px}.stat b{display:block;font-size:24px}.stat span{font-size:12px;color:var(--muted)}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:0 14px}.list{border-top:1px solid var(--line)}.entry{padding:14px 2px;border-bottom:1px solid var(--line)}.entry strong{display:block;margin-bottom:5px}.entry small{color:var(--muted)}.pill{display:inline-block;padding:4px 9px;border-radius:30px;background:#eaf4ff;color:#245b91;font-size:11px;font-weight:700}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:600px}td,th{text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:13px}th{background:#f7f9fc;color:#53647b}.actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.notice{background:#f0f7ff;border-left:4px solid var(--blue);padding:12px;border-radius:10px;font-size:13px;margin:12px 0}.classgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.classbox{padding:16px;border:1px solid var(--line);border-radius:15px;background:#fbfdff}.classbox b{display:block;font-size:18px}.qrgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}.qrCard{border:1px solid var(--line);padding:14px;border-radius:15px;text-align:center}.qrbox{display:flex;justify-content:center;padding:10px}.status{font-size:13px;color:var(--blue);padding:8px 0}.error{color:#b42318}.footer{text-align:center;color:#9aa7b8;font-size:11px;padding:24px}@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.classgrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.shell{padding:12px}.hero{padding:20px;border-radius:18px}.brand{font-size:16px}.grid{grid-template-columns:1fr 1fr;gap:9px}.tile{padding:14px;min-height:132px}.tile h3{font-size:13px}.tile p{font-size:11px}.formgrid{grid-template-columns:1fr}.section{padding:16px}.classgrid{grid-template-columns:1fr 1fr}}
+</style></head><body><main class="shell"><header class="hero"><div><div class="brand">☪ HIMAYATHUL ISLAM MADRASA</div><div class="sub">NADUVATHUR · DIGITAL MANAGEMENT PORTAL</div></div><small>ADMINISTRATION</small></header>
+<section id="login" class="login"><h2>സ്വാഗതം</h2><p class="muted">അഡ്മിൻ / അധ്യാപക QR വഴി പ്രവേശിക്കുക.</p><label>Access Token<input id="tokenInput" autocomplete="off" placeholder="Token നൽകുക"></label><button onclick="manualLogin()">പ്രവേശിക്കുക</button><div id="loginMsg" class="status"></div></section>
+<div id="app" class="hidden"><div class="topbar"><div><div class="who" id="who"></div><div class="scope" id="scope"></div></div><button class="ghost" onclick="logout()">പുറത്തുകടക്കുക</button></div><div id="home"></div><div id="page" class="hidden"></div><div id="msg" class="status"></div></div><div class="footer">HIMAYATHUL ISLAM MADRASA · NADUVATHUR</div></main>
 <script>
-const API_URL='https://script.google.com/macros/s/AKfycbzAHFgJynpZcqmwalkTPfocNu6piglgDmGRlqjfybV0CYaBNMbSN7FLOkmB0yiWR3Fa/exec';
-const CLASS_TEACHERS={
- '1':'മുഹമ്മദ് ഹാരിസ് മുസ്‌ലിയാർ',
- '2':'മുഹമ്മദ് അസ്‌ലം അൻവരി',
- '3':'മുഹമ്മദ് അബ്ദുൽ ഫത്താഹ് ദാഈ ദാരിമി',
- '4':'അഷ്റഫ് മുസ്‌ലിയാർ',
- '5':'മുഹമ്മദ് അബ്ദുൽ ഫത്താഹ് ദാഈ ദാരിമി',
- '6':'മുഹമ്മദ് ഹാരിസ് മുസ്‌ലിയാർ',
- '7':'അഷ്റഫ് മുസ്‌ലിയാർ',
- '8':'മുഹമ്മദ് അസ്‌ലം അൻവരി'
-};
-let token='',role='',teacher=null,data={},qrData=null;
-
-function api(action,params={}){
- return new Promise((resolve,reject)=>{
-  const cb='cb'+Date.now()+Math.floor(Math.random()*99999),script=document.createElement('script');
-  const timeout=setTimeout(()=>{cleanup();reject(Error('API timeout. Apps Script deployment പരിശോധിക്കുക.'))},25000);
-  function cleanup(){clearTimeout(timeout);script.remove();try{delete window[cb]}catch(e){}}
-  window[cb]=result=>{cleanup();resolve(result)};
-  script.onerror=()=>{cleanup();reject(Error('API connection failed. Web App URL / deployment പരിശോധിക്കുക.'))};
-  script.src=API_URL+'?'+new URLSearchParams({action,callback:cb,...params});
-  document.body.appendChild(script);
- });
-}
-function el(id){return document.getElementById(id)}
-function say(message,isError=false){el('msg').textContent=message;el('msg').classList.toggle('error',isError)}
-function fillClasses(){
- ['sclass','tclass','eclass','nclass'].forEach(id=>{
-  el(id).innerHTML=Array.from({length:8},(_,i)=>`<option value="${i+1}">ക്ലാസ് ${i+1}</option>`).join('');
- });
-}
-function setLoginMessage(message,error=true){el('loginMsg').textContent=message;el('loginMsg').classList.toggle('error',error)}
-async function boot(){
- fillClasses();
- const q=new URLSearchParams(location.search);
- const incoming=q.get('token');
- if(incoming){
-  token=incoming;
-  role=q.get('role')==='admin'?'admin':'teacher';
-  el('loginTitle').textContent=role==='admin'?'Super Admin Login':'Teacher Login';
-  el('tokenInput').value=''; // token is not shown in the field
-  await authenticate();
- }else{
-  el('loginTitle').textContent='Admin / Teacher Login';
- }
-}
-function manualLogin(){
- token=el('tokenInput').value.trim();
- role='admin';
- if(!token){setLoginMessage('Access token നൽകുക.');return}
- authenticate();
-}
-async function authenticate(){
- try{
-  const r=role==='admin'?await api('adminLogin',{token}):await api('teacherLogin',{token});
-  if(!r||!r.ok)throw Error((r&&r.message)||'Login failed');
-  teacher=r.teacher||null;
-  el('login').classList.add('hidden');el('app').classList.remove('hidden');
-  el('who').textContent=teacher?teacher.name:'Super Admin';
-  el('scope').textContent=teacher?'ക്ലാസ് '+teacher.className:'എല്ലാ ക്ലാസുകളും നിയന്ത്രിക്കാം';
-  el('adminTabs').classList.toggle('hidden',!!teacher);
-  el('teacherTabs').classList.toggle('hidden',!teacher);
-  document.querySelectorAll('.adminOnly').forEach(x=>x.classList.toggle('hidden',!!teacher));
-  el('recordHeading').textContent=teacher?'ക്ലാസ് '+teacher.className+' പഠന രേഖകൾ':'പഠന രേഖ / ചോദ്യം സൃഷ്ടിക്കുക';
-  await refresh();
-  if(role==='admin') tab('students',document.querySelector('#adminTabs button'));
-  else tab('records',document.querySelector('#teacherTabs button'));
- }catch(e){
-  setLoginMessage(e.message);
- }
-}
-function logout(){token='';teacher=null;location.href=location.pathname}
-function tab(id,button){
- document.querySelectorAll('#app>section').forEach(x=>x.classList.add('hidden'));
- el(id).classList.remove('hidden');
- document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
- if(button)button.classList.add('active');
-}
-async function refresh(){
- try{
-  const r=await api(role==='admin'?'adminDashboard':'teacherDashboard',{token});
-  if(!r.ok){say(r.message,true);return}
-  data=r;
-  if(role==='admin'){renderStudents();renderTeachers();renderExams();renderNotices();await loadQRLinks()}
-  renderRecords();
- }catch(e){say(e.message,true)}
-}
-async function saveStudent(){
- const r=await api('saveStudent',{token,id:el('sid').value,name:el('sname').value,className:el('sclass').value,gender:el('gender').value,parentName:el('parent').value,phone:el('phone').value});
- say(r.message,!r.ok);if(r.ok)refresh();
-}
-async function saveTeacher(){
- const cls=el('tclass').value,name=el('tname').value.trim()||CLASS_TEACHERS[cls];
- const r=await api('saveTeacher',{token,className:cls,name});
- say(r.message,!r.ok);
- if(r.ok){el('tname').value='';await refresh();tab('teachers',document.querySelectorAll('#adminTabs button')[1])}
-}
-async function createRecord(){
- const r=await api('createRecord',{token,title:el('rtitle').value,description:el('rdesc').value,responseType:el('rtype').value,options:el('roptions').value,dueDate:el('due').value});
- say(r.message,!r.ok);if(r.ok){el('rtitle').value='';refresh()}
-}
-async function createExam(){
- const r=await api('createExam',{token,title:el('etitle').value,className:el('eclass').value,subject:el('subject').value,examDate:el('edate').value,maxMarks:el('maxmarks').value});
- say(r.message,!r.ok);if(r.ok)refresh();
-}
-async function saveResult(){
- const r=await api('saveResult',{token,examId:el('examPick').value,studentId:el('resultStudent').value,marks:el('marks').value,remarks:el('remarks').value});
- say(r.message,!r.ok);if(r.ok)refresh();
-}
-async function createNotice(){
- const r=await api('createNotice',{token,title:el('ntitle').value,message:el('nmessage').value,targetType:el('ntarget').value,targetClass:el('nclass').value,targetStudentId:el('nstudent').value});
- say(r.message,!r.ok);if(r.ok)refresh();
-}
-function renderStudents(){
- el('studentsList').innerHTML='<h4>വിദ്യാർത്ഥികൾ ('+(data.students||[]).length+')</h4><div class="tablewrap"><table><tr><th>ID</th><th>പേര്</th><th>ക്ലാസ്</th><th>Status</th></tr>'+
- (data.students||[]).map(s=>'<tr><td>'+esc(s.ID)+'</td><td>'+esc(s.Name)+'</td><td>'+esc(s.Class)+'</td><td>'+esc(s.Status)+'</td></tr>').join('')+'</table></div>';
-}
-function renderTeachers(){
- const list=(data.teachers||[]).slice().sort((a,b)=>Number(a.Class)-Number(b.Class));
- el('teacherList').innerHTML='<h4>അധ്യാപകരുടെ പട്ടിക</h4><div class="tablewrap"><table><tr><th>ക്ലാസ്</th><th>അധ്യാപകൻ</th><th>Status</th></tr>'+
- list.map(t=>'<tr><td>'+esc(t.Class)+'</td><td>'+esc(t.Name)+'</td><td>'+esc(t.Status||'Active')+'</td></tr>').join('')+'</table></div>';
-}
-async function loadQRLinks(){
- el('qrStatus').textContent='QR ലിങ്കുകൾ ലഭ്യമാക്കുന്നു...';
- try{
-  const r=await api('getQRLinks',{token});
-  if(!r.ok)throw Error(r.message||'QR links ലഭിച്ചില്ല.');
-  qrData=r;
-  renderQRCards();
-  el('qrStatus').textContent='QR ലിങ്കുകൾ പുതുക്കി. QR സ്കാൻ ചെയ്ത് പരിശോധിച്ചശേഷം മാത്രം പ്രിന്റ് ചെയ്യുക.';
- }catch(e){el('qrStatus').textContent=e.message;el('qrStatus').classList.add('error')}
-}
-function renderQRCards(){
- const host=el('qrCards');host.innerHTML='';
- if(!qrData)return;
- const cards=[];
- if(qrData.superAdmin&&qrData.superAdmin.url){
-  cards.push({heading:'SUPER ADMIN',name:qrData.superAdmin.name||'സ്വദർ മുഅല്ലിം',url:qrData.superAdmin.url,admin:true});
- }
- (qrData.teachers||[]).slice().sort((a,b)=>Number(a.className)-Number(b.className)).forEach(t=>{
-  cards.push({heading:'CLASS '+t.className,name:t.name,url:t.url});
- });
- cards.forEach((c,index)=>{
-  const card=document.createElement('div');card.className='qrCard';
-  const h=document.createElement('h4');h.textContent=c.heading;
-  const name=document.createElement('p');name.textContent=c.name;
-  const pill=document.createElement('span');pill.className='pill';pill.textContent=c.admin?'All Classes':'Teacher Login';
-  const box=document.createElement('div');box.className='qrbox';
-  const link=document.createElement('a');link.href=c.url;link.target='_blank';link.rel='noopener';link.textContent='Open login link';
-  card.append(h,name,pill,box,link);host.appendChild(card);
-  if(window.QRCode){new QRCode(box,{text:c.url,width:120,height:120,correctLevel:QRCode.CorrectLevel.M})}
-  else{box.textContent='QR library load ആയില്ല'}
- });
-}
-function renderRecords(){
- const arr=data.records||[];
- el('recordList').innerHTML='<h4>'+(teacher?'ക്ലാസ് '+teacher.className:'എല്ലാ ക്ലാസുകളും')+' · രേഖകൾ ('+arr.length+')</h4>'+
- (arr.map(r=>'<div class="item"><b>'+esc(r.Title)+'</b> <span class="muted">— ക്ലാസ് '+esc(r.Class)+'</span><p class="muted">'+esc(r.Description||'')+'</p>'+
- (r.responses||[]).map(a=>'<div class="muted">'+esc(a['Student Name'])+': '+esc(a.Answer)+'</div>').join('')+'</div>').join('')||'<p class="muted">രേഖകളില്ല.</p>');
-}
-function renderExams(){
- el('examList').innerHTML=(data.exams||[]).map(e=>'<div class="item">'+esc(e.Title)+' · ക്ലാസ് '+esc(e.Class)+' · '+esc(e.Subject)+'</div>').join('');
- el('examPick').innerHTML=(data.exams||[]).map(e=>'<option value="'+esc(e['Exam ID'])+'">'+esc(e.Title)+' / '+esc(e.Class)+'</option>').join('');
-}
-function renderNotices(){
- el('noticeList').innerHTML=(data.notices||[]).map(n=>'<div class="item"><b>'+esc(n.Title)+'</b><p>'+esc(n.Message)+'</p></div>').join('');
-}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-boot();
-</script>
-</body>
-</html>
+const API_URL='https://script.google.com/macros/s/AKfycbzAHFgJynpZcqmwalkTPfocNu6piglgDmGRlqjfybV0CYaBNMbSN7FLOkmB0yiWR3Fa/exec';let token='',role='',teacher=null,data={},qrData=null;
+const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function api(action,params={}){return new Promise((resolve,reject)=>{const cb='cb'+Date.now()+Math.floor(Math.random()*99999),s=document.createElement('script'),tm=setTimeout(()=>{clean();reject(Error('സെർവർ പ്രതികരിക്കുന്നില്ല.'))},25000);function clean(){clearTimeout(tm);s.remove();try{delete window[cb]}catch(e){}}window[cb]=r=>{clean();resolve(r)};s.onerror=()=>{clean();reject(Error('API ബന്ധിപ്പിക്കാൻ കഴിഞ്ഞില്ല.'))};s.src=API_URL+'?'+new URLSearchParams({action,callback:cb,...params});document.body.appendChild(s)})}
+async function boot(){let q=new URLSearchParams(location.search);if(q.get('token')){token=q.get('token');role=q.get('role')==='admin'?'admin':'teacher';await auth()} }
+function manualLogin(){token=$('tokenInput').value.trim();role='admin';if(token)auth();else $('loginMsg').textContent='Token നൽകുക.'}
+async function auth(){try{let r=await api(role==='admin'?'adminLogin':'teacherLogin',{token});if(!r.ok)throw Error(r.message);teacher=r.teacher||null;$('login').classList.add('hidden');$('app').classList.remove('hidden');$('who').textContent=teacher?teacher.name:'സ്വദർ മുഅല്ലിം';$('scope').textContent=teacher?'ക്ലാസ് '+teacher.className+' · അധ്യാപക പോർട്ടൽ':'എല്ലാ ക്ലാസുകളുടെയും നിയന്ത്രണം';await refresh();home()}catch(e){$('loginMsg').textContent=e.message}}
+function logout(){location.href=location.pathname}async function refresh(){let r=await api(role==='admin'?'adminDashboard':'teacherDashboard',{token});if(!r.ok)throw Error(r.message);data=r}
+function home(){ $('page').classList.add('hidden');$('home').classList.remove('hidden');if(teacher){$('home').innerHTML=`<div class="notice">ക്ലാസ് ${esc(teacher.className)} · നിങ്ങളുടെ ക്ലാസിലെ വിദ്യാർത്ഥികളുടെയും പ്രവർത്തനങ്ങളുടെയും വിവരങ്ങൾ മാത്രം.</div><div class="grid">${tile('🕌','നിസ്കാര റിപ്പോർട്ട്','വിദ്യാർത്ഥികളുടെ നിസ്കാര രേഖകൾ','prayer')}${tile('📚','പഠന പ്രവർത്തനങ്ങൾ','ചോദ്യങ്ങൾ, പാഠങ്ങൾ, ലിങ്കുകൾ, ക്വിസുകൾ','learning')}${tile('🏅','പരീക്ഷാഫലങ്ങൾ','വിഷയവും മാർക്കും രേഖപ്പെടുത്തുക','results')}${tile('📢','മറ്റ് അറിയിപ്പുകൾ','ക്ലാസിനുള്ള അറിയിപ്പുകൾ പ്രസിദ്ധീകരിക്കുക','notices')}${tile('🗓️','ടൈംടേബിൾ','സാധാരണയും പരീക്ഷാ ടൈംടേബിളും','timetable')}${tile('💬','വിദ്യാർത്ഥി അഭിപ്രായങ്ങൾ','ഓരോ വിദ്യാർത്ഥിക്കും അഭിപ്രായം ചേർക്കുക','feedback')}</div>`}else{$('home').innerHTML=`<div class="notice">സ്വദർ മുഅല്ലിം · എല്ലാ ക്ലാസുകളുടെയും വിവരങ്ങൾ ഒരിടത്ത്. ഓരോ വിഭാഗവും തുറന്ന് പ്രത്യേകം നിയന്ത്രിക്കാം.</div><div class="stats">${stat('വിദ്യാർത്ഥികൾ',(data.students||[]).length)}${stat('അധ്യാപകർ',(data.teachers||[]).length)}${stat('പഠന പ്രവർത്തനങ്ങൾ',(data.activities||[]).length)}${stat('അറിയിപ്പുകൾ',(data.notices||[]).length)}</div><div class="classgrid">${Array.from({length:8},(_,i)=>{let c=String(i+1),n=(data.students||[]).filter(s=>String(s.Class)===c).length,t=(data.teachers||[]).find(x=>String(x.Class)===c);return `<div class="classbox"><b>ക്ലാസ് ${c}</b><small>${n} വിദ്യാർത്ഥികൾ</small><p class="muted">${esc(t?.Name||'അധ്യാപകനെ ചേർത്തിട്ടില്ല')}</p><button class="ghost" onclick="openPage('class','${c}')">ക്ലാസ് തുറക്കുക →</button></div>`}).join('')}</div><div class="grid" style="margin-top:16px">${tile('👨‍🎓','വിദ്യാർത്ഥികൾ','പുതിയ വിദ്യാർത്ഥികൾ, പട്ടിക','students')}${tile('👨‍🏫','അധ്യാപകർ & QR','നിലവിലെ QR ലിങ്കുകൾ','teachers')}${tile('📚','പഠന പ്രവർത്തനങ്ങൾ','എല്ലാ ക്ലാസുകളിലെയും പ്രവർത്തനങ്ങൾ','learning')}${tile('📝','പരീക്ഷാഫലങ്ങൾ','പരീക്ഷയും മാർക്കും','results')}${tile('📢','അറിയിപ്പുകൾ','മദ്റസ / ക്ലാസ് അറിയിപ്പുകൾ','notices')}${tile('🗓️','ടൈംടേബിൾ','ക്ലാസ് ടൈംടേബിളുകൾ','timetable')}${tile('🕌','നിസ്കാര റിപ്പോർട്ട്','എല്ലാ ക്ലാസുകളുടെയും റിപ്പോർട്ട്','prayer')}${tile('💬','അഭിപ്രായങ്ങൾ','അധ്യാപകരുടെ അഭിപ്രായങ്ങൾ','feedback')}</div>`}}
+function tile(i,t,d,k){return `<button class="tile" onclick="openPage('${k}')"><div class="ico">${i}</div><h3>${t}</h3><p>${d}</p></button>`}function stat(t,n){return `<div class="stat"><b>${n}</b><span>${t}</span></div>`}
+function frame(title,body){$('home').classList.add('hidden');$('page').classList.remove('hidden');$('page').innerHTML=`<section class="section"><div class="sectionhead"><h2>${title}</h2><button class="back" onclick="home()">← പ്രധാന പേജ്</button></div>${body}</section>`}
+function clsSelect(id='fclass',selected=''){return `<select id="${id}">${Array.from({length:8},(_,i)=>`<option ${String(i+1)===String(selected)?'selected':''} value="${i+1}">ക്ലാസ് ${i+1}</option>`).join('')}</select>`}function classFilter(c){return teacher?String(teacher.className)===String(c):true}
+async function openPage(k,arg=''){try{if(k==='class'){frame('ക്ലാസ് '+arg,`<div class="grid">${tile('👨‍🎓','വിദ്യാർത്ഥികൾ','ഈ ക്ലാസിലെ കുട്ടികൾ','students')}${tile('🕌','നിസ്കാര റിപ്പോർട്ട്','ക്ലാസ് റിപ്പോർട്ട്','prayer')}${tile('📚','പഠന പ്രവർത്തനങ്ങൾ','ക്ലാസ് പ്രവർത്തനങ്ങൾ','learning')}${tile('🗓️','ടൈംടേബിൾ','ക്ലാസ് ടൈംടേബിൾ','timetable')}</div>`);return}
+if(k==='students'){let arr=(data.students||[]).filter(s=>classFilter(s.Class));frame('വിദ്യാർത്ഥികൾ',`<div class="formgrid"><label>അഡ്മിഷൻ ID<input id="sid"></label><label>വിദ്യാർത്ഥിയുടെ പേര്<input id="sname"></label><label>ക്ലാസ്${clsSelect('sclass',teacher?.className||1)}</label><label>രക്ഷിതാവിന്റെ പേര്<input id="parent"></label><label>ഫോൺ<input id="phone"></label><label>Gender<input id="gender"></label></div><button onclick="saveStudent()">വിദ്യാർത്ഥിയെ സേവ് ചെയ്യുക</button><div class="list" style="margin-top:18px">${arr.map(s=>entry(`${s.Name} · ${s.ID}`,`ക്ലാസ് ${s.Class} · ${s.Phone||''}`)).join('')}</div>`)}
+else if(k==='teachers'){if(teacher)throw Error('അഡ്മിൻ വിഭാഗം മാത്രം.');frame('അധ്യാപകർ & QR കോഡുകൾ',`<div class="actions"><button onclick="window.print()">QR പ്രിന്റ് ചെയ്യുക</button><button class="ghost" onclick="loadQR()">QR പുതുക്കി കാണിക്കുക</button></div><div id="qrgrid" class="qrgrid"></div><div class="list">${(data.teachers||[]).map(t=>entry('ക്ലാസ് '+t.Class+' · '+t.Name,t.Status||'Active')).join('')}</div>`);await loadQR()}
+else if(k==='learning'){let acts=(data.activities||[]).filter(a=>classFilter(a.Class));frame('പഠന പ്രവർത്തനങ്ങൾ',`${!teacher?`<label>ക്ലാസ്${clsSelect('fclass')}</label>`:''}<div class="actions"><button onclick="activityForm()">＋ പുതിയ പ്രവർത്തനം സൃഷ്ടിക്കുക</button></div><div id="activityForm"></div><div class="list">${acts.map(a=>entry(a.Title,`ക്ലാസ് ${a.Class} · ${a.Type} · ${(a.responses||[]).length} മറുപടികൾ`+(a.Content?`<p>${esc(a.Content)}</p>`:'' )+(a.responses||[]).map(x=>`<p class="muted">${esc(x['Student Name'])}: ${esc(x.Answer)}</p>`).join(''))).join('')||'<p class="muted">പ്രവർത്തനങ്ങളില്ല.</p>'}</div>`)}
+else if(k==='results'){let exams=(data.exams||[]).filter(e=>classFilter(e.Class));frame('പരീക്ഷാഫലങ്ങൾ',`${!teacher?`<label>ക്ലാസ്${clsSelect('eclass')}</label>`:''}<div class="formgrid"><label>പരീക്ഷയുടെ പേര്<input id="etitle"></label><label>വിഷയം<input id="subject"></label><label>പരീക്ഷ തീയതി<input type="date" id="edate"></label><label>പരമാവധി മാർക്ക്<input id="maxmarks" type="number" value="100"></label></div><button onclick="createExam()">പരീക്ഷ ചേർക്കുക</button><hr><label>പരീക്ഷ തിരഞ്ഞെടുക്കുക<select id="examPick">${exams.map(e=>`<option value="${esc(e['Exam ID'])}">${esc(e.Title)} · ${esc(e.Class)}</option>`).join('')}</select></label><div class="formgrid"><label>വിദ്യാർത്ഥിയുടെ ID<input id="resultStudent"></label><label>മാർക്ക്<input id="marks" type="number"></label><label>അഭിപ്രായം<input id="remarks"></label></div><button onclick="saveResult()">മാർക്ക് സേവ് ചെയ്യുക</button><div class="list">${(data.results||[]).filter(x=>classFilter(x.Class)).map(x=>entry(x['Student Name']+' · '+x.Subject,x.Marks+'/'+x['Max Marks'])).join('')}</div>`)}
+else if(k==='notices'){frame('അറിയിപ്പുകൾ',`${!teacher?`<label>ലക്ഷ്യ ക്ലാസ്${clsSelect('nclass')}</label>`:''}<label>തലക്കെട്ട്<input id="ntitle"></label><label>അറിയിപ്പ്<textarea id="nmessage"></textarea></label><button onclick="createNotice()">പ്രസിദ്ധീകരിക്കുക</button><div class="list">${(data.notices||[]).filter(n=>!teacher||n['Target Type']==='All'||String(n['Target Class'])===String(teacher.className)).map(n=>entry(n.Title,n.Message)).join('')}</div>`)}
+else if(k==='timetable'){frame('ടൈംടേബിൾ',`${!teacher?`<label>ക്ലാസ്${clsSelect('fclass')}</label>`:''}<div class="notice">ആദ്യം സ്ഥിരം ടൈംടേബിൾ, അതിന് താഴെ പരീക്ഷാ ടൈംടേബിൾ കാണാം.</div><h3>സ്ഥിരം ടൈംടേബിൾ</h3><div class="list">${(data.timetables||[]).filter(x=>classFilter(x.Class)&&x.Type==='regular').map(x=>entry(x['Day/Date']+' · '+x.Subject,x.Time+' · ക്ലാസ് '+x.Class)).join('')}</div><h3>പരീക്ഷാ ടൈംടേബിൾ</h3><div class="list">${(data.timetables||[]).filter(x=>classFilter(x.Class)&&x.Type==='exam').map(x=>entry(x['Exam Type']+' · '+x['Day/Date']+' · '+x.Subject,x.Time+' · ക്ലാസ് '+x.Class)).join('')}</div><hr><h3>പുതിയ ടൈംടേബിൾ ചേർക്കുക</h3>${!teacher?`<label>ക്ലാസ്${clsSelect('ttclass')}</label>`:''}<label>തരം<select id="ttype" onchange="toggleExamType()"><option value="regular">സ്ഥിരം ടൈംടേബിൾ</option><option value="exam">പരീക്ഷാ ടൈംടേബിൾ</option></select></label><div id="examTypeWrap" class="hidden"><label>പരീക്ഷ<select id="examType"><option>പാദവാർഷിക പരീക്ഷ</option><option>അർദ്ധവാർഷിക പരീക്ഷ</option><option>വാർഷിക പരീക്ഷ</option></select></label></div><div class="formgrid"><label>ദിവസം / തീയതി<input id="dayDate" placeholder="തിങ്കൾ / 2026-12-01"></label><label>വിഷയം<input id="ttsubject"></label><label>സമയം<input id="tttime" placeholder="10:00 - 10:45"></label></div><button onclick="saveTimetable()">ചേർക്കുക</button>`)}
+else if(k==='prayer'){let arr=(data.prayers||[]).filter(p=>classFilter(p.Class));frame('നിസ്കാര റിപ്പോർട്ട്',`<div class="notice">നിലവിലുള്ള നിസ്കാര രേഖകളുടെ കണക്കുകൾ മാത്രം ഇവിടെ കാണിക്കുന്നു. നിസ്കാര രേഖപ്പെടുത്തൽ രീതി മാറ്റിയിട്ടില്ല.</div><div class="tablewrap"><table><tr><th>വിദ്യാർത്ഥി</th><th>ക്ലാസ്</th><th>ദുഹർ</th><th>അസർ</th><th>മഗ്രിബ്</th><th>ഇശാ</th><th>ഫജർ</th></tr>${arr.map(p=>`<tr><td>${esc(p.Name)}</td><td>${esc(p.Class)}</td>${['Dhuhr','Asr','Maghrib','Isha','Fajr'].map(x=>`<td>${esc(p[x]||'—')}</td>`).join('')}</tr>`).join('')}</table></div>`)}
+else if(k==='feedback'){let st=(data.students||[]).filter(s=>classFilter(s.Class));frame('വിദ്യാർത്ഥികളുടെ അഭിപ്രായങ്ങൾ',`<label>വിദ്യാർത്ഥി<select id="fbstudent">${st.map(s=>`<option value="${esc(s.ID)}">${esc(s.Name)} · ${esc(s.ID)}</option>`).join('')}</select></label><label>പ്രീസെറ്റ് അഭിപ്രായം<select id="preset" onchange="if(this.value)$('comment').value=this.value"><option value="">തിരഞ്ഞെടുക്കുക</option>${['പഠനത്തിൽ നല്ല പുരോഗതി കാണിക്കുന്നു.','കൂടുതൽ ശ്രദ്ധയും പരിശീലനവും ആവശ്യമാണ്.','നല്ല അച്ചടക്കവും പെരുമാറ്റവും പുലർത്തുന്നു.','പാഠങ്ങൾ കൃത്യമായി പഠിച്ചുവരുന്നു.','കൂടുതൽ വായനാശീലം വളർത്തണം.','നിസ്കാര കാര്യങ്ങളിൽ കൂടുതൽ ശ്രദ്ധിക്കണം.'].map(x=>`<option>${x}</option>`).join('')}</select></label><label>അഭിപ്രായം<textarea id="comment" placeholder="സ്വന്തമായി അഭിപ്രായം എഴുതാം..."></textarea></label><button onclick="saveFeedback()">അഭിപ്രായം പ്രസിദ്ധീകരിക്കുക</button><div class="list">${(data.feedback||[]).filter(x=>classFilter(x.Class)).map(x=>entry(x['Student Name'],x.Comment)).join('')}</div>`)}
+}catch(e){say(e.message,true)}}
+function entry(a,b){return `<div class="entry"><strong>${esc(a)}</strong><small>${esc(b)}</small></div>`}
+function activityForm(){$('activityForm').innerHTML=`<div class="section" style="margin:12px 0;background:#f8fbff"><h3>പുതിയ പഠന പ്രവർത്തനം</h3>${!teacher?`<label>ക്ലാസ്${clsSelect('aclass')}</label>`:''}<div class="formgrid"><label>തരം<select id="atype"><option value="yesno">അതെ / ഇല്ല ചോദ്യം</option><option value="text">എഴുത്ത് ഉത്തരം</option><option value="choice">MCQ / ക്വിസ്</option><option value="lesson">പാഠവും അർത്ഥവും</option><option value="link">ലിങ്ക്</option><option value="game">ഗെയിം / പഠന കളി</option></select></label><label>തലക്കെട്ട്<input id="atitle"></label></div><label>ചോദ്യം / പാഠം / വിവരണം / ലിങ്ക്<textarea id="acontent"></textarea></label><label>ഓപ്ഷനുകൾ (MCQ ആണെങ്കിൽ | ഉപയോഗിച്ച് വേർതിരിക്കുക)<input id="aoptions" placeholder="A|B|C|D"></label><label>അവസാന തീയതി<input id="adue" type="date"></label><button onclick="saveActivity()">പ്രസിദ്ധീകരിക്കുക</button></div>`}
+function toggleExamType(){$('examTypeWrap').classList.toggle('hidden',$('ttype').value!=='exam')}
+async function saveActivity(){let r=await api('saveActivity',{token,className:teacher?.className||$('aclass')?.value||'1',type:$('atype').value,title:$('atitle').value,content:$('acontent').value,options:$('aoptions').value,dueDate:$('adue').value});say(r.message,!r.ok);if(r.ok){await refresh();openPage('learning')}}
+async function saveTimetable(){let r=await api('saveTimetable',{token,className:teacher?.className||$('ttclass')?.value||'1',type:$('ttype').value,examType:$('examType')?.value||'',dayDate:$('dayDate').value,subject:$('ttsubject').value,time:$('tttime').value});say(r.message,!r.ok);if(r.ok){await refresh();openPage('timetable')}}
+async function saveFeedback(){let r=await api('saveFeedback',{token,studentId:$('fbstudent').value,comment:$('comment').value});say(r.message,!r.ok);if(r.ok){await refresh();openPage('feedback')}}
+async function saveStudent(){let r=await api('saveStudent',{token,id:$('sid').value,name:$('sname').value,className:$('sclass').value,gender:$('gender').value,parentName:$('parent').value,phone:$('phone').value});say(r.message,!r.ok);if(r.ok){await refresh();openPage('students')}}
+async function createExam(){let r=await api('createExam',{token,title:$('etitle').value,className:teacher?.className||$('eclass')?.value||$('fclass')?.value||'1',subject:$('subject').value,examDate:$('edate').value,maxMarks:$('maxmarks').value});say(r.message,!r.ok);if(r.ok){await refresh();openPage('results')}}
+async function saveResult(){let r=await api('saveResult',{token,examId:$('examPick').value,studentId:$('resultStudent').value,marks:$('marks').value,remarks:$('remarks').value});say(r.message,!r.ok);if(r.ok){await refresh();openPage('results')}}
+async function createNotice(){let r=await api('createNotice',{token,title:$('ntitle').value,message:$('nmessage').value,targetType:teacher?'Class':'Class',targetClass:teacher?.className||$('nclass')?.value||'1'});say(r.message,!r.ok);if(r.ok){await refresh();openPage('notices')}}
+async function loadQR(){let r=await api('getQRLinks',{token});if(!r.ok)throw Error(r.message);qrData=r;let host=$('qrgrid');if(!host)return;host.innerHTML='';let list=[{name:'സ്വദർ മുഅല്ലിം',url:r.superAdmin?.url},...(r.teachers||[]).map(x=>({name:'ക്ലാസ് '+x.className+' · '+x.name,url:x.url}))];list.forEach(x=>{let d=document.createElement('div');d.className='qrCard';d.innerHTML=`<b>${esc(x.name)}</b><div class="qrbox"></div>`;host.appendChild(d);if(x.url&&window.QRCode)new QRCode(d.querySelector('.qrbox'),{text:x.url,width:120,height:120})})}
+function say(t,e=false){$('msg').textContent=t;$('msg').classList.toggle('error',e)}boot();
+</script></body></html>
